@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  proxmox-qdevice:
+    image: ubuntu:20.04  # You can change this to a more appropriate image if you need
+    container_name: proxmox-quorum-device
+    restart: unless-stopped
+    networks:
+      - proxmox-net
+    environment:
+      - PUID=996
+      - PGID=988
+      - TZ=America/New_York
+    volumes:
+      - /mnt/data/docker/volumes/corosync:/etc/corosync:ro  # You can bind the corosync configuration if needed
+      - /mnt/data/docker/volumes/corosync_logs:/var/log/corosync:rw  # Optionally, log directory for corosync logs
+    command: |
+      bash -c "
+        apt update && \
+        apt install -y corosync corosync-qdevice && \
+        corosync-qdevice -f /etc/corosync/corosync.conf"
+    
+networks:
+  proxmox-net:
+    driver: bridge
