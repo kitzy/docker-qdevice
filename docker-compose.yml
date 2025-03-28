@@ -1,30 +1,33 @@
-version: '3.8'
-
 services:
-  proxmox-qdevice:
-    image: ubuntu:20.04  # You can change this to a more appropriate image if you need
-    container_name: proxmox-quorum-device
-    restart: unless-stopped
-    networks:
-      - proxmox-net
+  qnetd:
+    container_name: proxmox-qdevice
+    image: bcleonard/proxmox-qdevice:v2.0
+    build: .
     ports:
-      - 5405:5405
+      - "22:22"
+      - "5403:5403"
     environment:
+      - VAR=example
       - PUID=996
       - PGID=988
       - TZ=America/New_York
-      - COROSYNC_NODE_NAME=qdevice-node
-      - COROSYNC_NODE_IP=10.253.20.99
-      - COROSYNC_PVE_IP=10.253.20.201
     volumes:
-      - /mnt/data/docker/volumes/corosync:/etc/corosync:rw  # You can bind the corosync configuration if needed
-      - /mnt/data/docker/volumes/corosync_logs:/var/log/corosync:rw  # Optionally, log directory for corosync logs
-    command: |
-      bash -c "
-        apt update && \
-        apt install -y corosync corosync-qdevice && \
-        corosync-qdevice -f /etc/corosync/corosync.conf"
-    
+      - /mnt/data/docker/volumes/corosync:/etc/corosync:rw
+      - /mnt/data/docker/volumes/corosync_logs:/var/log/corosync:rw
+    restart: unless-stopped
+    hostname: qdevice.kitzy.net
+    networks: 
+      vlan:
+        ipv4_address: 10.253.20.98
+
 networks:
-  proxmox-net:
-    driver: bridge
+ vlan:
+    driver: macvlan
+    driver_opts:
+      parent: bond0
+    ipam:
+       driver: default
+       config:
+        - subnet: "255.255.255.0"
+          ip_range: "10.253.20.98/32"
+          gateway: "10.253.20.1"
