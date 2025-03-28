@@ -6,7 +6,7 @@ services:
       - "22:22"
       - "5403:5403"
     environment:
-      - VAR=example
+      - NEW_ROOT_PASSWORD=${NEW_ROOT_PASSWORD}
       - PUID=996
       - PGID=988
       - TZ=America/New_York
