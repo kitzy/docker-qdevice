@@ -13,8 +13,11 @@ services:
       - PUID=996
       - PGID=988
       - TZ=America/New_York
+      - COROSYNC_NODE_NAME=qdevice-node
+      - COROSYNC_NODE_IP=10.253.20.99
+      - COROSYNC_PVE_IP=10.253.20.201
     volumes:
-      - /mnt/data/docker/volumes/corosync:/etc/corosync:ro  # You can bind the corosync configuration if needed
+      - /mnt/data/docker/volumes/corosync:/etc/corosync:rw  # You can bind the corosync configuration if needed
       - /mnt/data/docker/volumes/corosync_logs:/var/log/corosync:rw  # Optionally, log directory for corosync logs
     command: |
       bash -c "
